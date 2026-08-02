@@ -1,14 +1,23 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from typing import List, Optional
 import agent
 import nutrition
 import wellness
+import ui
 
 app = FastAPI(
     title="Dieto Swiggy AI Health Coach API",
     description="Backend service matching Swiggy MCP orders to Dieto Nutrition and Wellness pipelines."
 )
+
+@app.get("/", response_class=HTMLResponse)
+async def serve_ui():
+    """
+    Serves the beautiful Swiggy-like Web UI simulator dashboard.
+    """
+    return ui.HTML_CONTENT
 
 # ----------------- Schemas -----------------
 
