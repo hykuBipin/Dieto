@@ -43,7 +43,10 @@ class RecoveryRequest(BaseModel):
 MOCK_SWIGGY_ORDERS = {
     "ord_swiggy_7711": ["Chicken Biryani", "Chicken 65", "Lime Soda"],
     "ord_swiggy_8822": ["Paneer Tikka Roll", "Lime Soda"],
-    "ord_swiggy_9933": ["Tandoori Chicken Salad"]
+    "ord_swiggy_9933": ["Tandoori Chicken Salad"],
+    "ord_swiggy_1234": ["Tandoori Chicken Salad", "Lime Soda"],
+    "ord_swiggy_5678": ["Double Cheese Burger", "Paneer Tikka Roll"],
+    "ord_swiggy_9012": ["Paneer Rice Bowl", "Mint Juice"]
 }
 
 # ----------------- Endpoints -----------------

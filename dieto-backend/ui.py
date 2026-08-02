@@ -567,8 +567,12 @@ HTML_CONTENT = """<!DOCTYPE html>
     <!-- Right Column: Dieto Coach Panel -->
     <div class="panel-dieto">
         <div class="dieto-header">
-            <div class="dieto-title">🥗 Dieto Coach Tracker</div>
-            <span style="font-size: 12px; color: rgba(255,255,255,0.6);">Mode: Weight Loss</span>
+            <div class="dieto-title">🥗 Dieto Caretaker</div>
+            <select id="dietModeSelect" onchange="changeDietMode()" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 2px 6px; font-size: 11px; outline: none; cursor: pointer;">
+                <option value="strict">Strict Mode (1,600 kcal)</option>
+                <option value="balanced" selected>Balanced Mode (2,000 kcal)</option>
+                <option value="relaxed">Relaxed Mode (2,800 kcal)</option>
+            </select>
         </div>
 
         <!-- Budget Tracker -->
@@ -595,19 +599,19 @@ HTML_CONTENT = """<!DOCTYPE html>
         </div>
 
         <!-- Neutralizer Box -->
-        <div class="neutralizer-box" id="neutralizerBox">
-            <div class="neutralizer-title">⚠️ Calorie Target Exceeded</div>
-            <p class="neutralizer-desc">
-                Your pending order puts you above your daily budget. Choose a wellness option to balance your day:
+        <div class="neutralizer-box" id="neutralizerBox" style="background-color: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25);">
+            <div class="neutralizer-title" style="color: #F59E0B;">ℹ️ Dieto Caretaker Tip</div>
+            <p class="neutralizer-desc" style="color: rgba(255,255,255,0.85); line-height: 1.4;">
+                Enjoy your meal! Rather than stopping your order, choose wellness suggestions to support digestion:
             </p>
             <div class="neutralizer-options">
                 <label class="checkbox-container">
                     <input type="checkbox" id="chkMintJuice" onchange="recalculateTotals()">
-                    🍵 Swap/Add Mint Juice (-150 kcal detox balancer)
+                    🍵 Swap/Add Mint Juice (-150 kcal detox helper)
                 </label>
                 <label class="checkbox-container">
                     <input type="checkbox" id="chkExercise" onchange="recalculateTotals()">
-                    🏃 Accept easy walking suggestion (10–20 mins post-meal)
+                    🏃 Accept walking suggestion (10–20 mins post-meal)
                 </label>
             </div>
         </div>
@@ -629,6 +633,19 @@ HTML_CONTENT = """<!DOCTYPE html>
     
     let cart = [];
     let orderPlacedId = "";
+
+    function changeDietMode() {
+        const mode = document.getElementById('dietModeSelect').value;
+        if (mode === 'strict') {
+            targetCalories = 1600;
+        } else if (mode === 'balanced') {
+            targetCalories = 2000;
+        } else {
+            targetCalories = 2800;
+        }
+        document.getElementById('dietoTargetScore').innerText = `Goal: ${targetCalories} kcal`;
+        updateCartUI();
+    }
 
     function addToCart(name, calories, protein) {
         cart.push({name, calories, protein});
@@ -730,44 +747,53 @@ HTML_CONTENT = """<!DOCTYPE html>
         
         // Mock get_addresses
         setTimeout(() => {
-            logTerminal("[MCP] Address resolved: addr_01HXYZ");
+            logTerminal("[MCP] Call: get_addresses() -> Completed (200 OK)");
+            logTerminal("[MCP] Address resolved: Home (ID: addr_01HXYZ)");
             
-            // Mock placing order
+            // Mock update_food_cart
             setTimeout(() => {
-                const orderId = "ord_swiggy_7711";
-                orderPlacedId = orderId;
-                logTerminal(`[MCP] Success! Order placed. ID: ${orderId}`);
+                logTerminal("[MCP] Call: update_food_cart() -> Completed (200 OK)");
                 
-                // Read checkboxes
-                const chkMint = document.getElementById('chkMintJuice').checked;
-                const chkExercise = document.getElementById('chkExercise').checked;
+                // Mock place_food_order
+                setTimeout(() => {
+                    logTerminal("[MCP] Call: place_food_order() -> Completed (200 OK)");
+                    
+                    const orderId = "ord_swiggy_7711";
+                    orderPlacedId = orderId;
+                    logTerminal(`[MCP] Success! Order placed. ID: ${orderId}`);
+                    logTerminal("[SYSTEM] Swiggy Order Completed successfully!");
+                    
+                    // Read checkboxes
+                    const chkMint = document.getElementById('chkMintJuice').checked;
+                    const chkExercise = document.getElementById('chkExercise').checked;
 
-                // POST API call to fastapi sync-order
-                fetch('/sync-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ order_id: orderId })
-                })
-                .then(r => r.json())
-                .then(data => {
-                    let finalAdded = data.total_calories;
-                    if (chkMint) {
-                        finalAdded = Math.max(0, finalAdded - 150);
-                    }
-                    baseCalories += finalAdded;
-                    
-                    logTerminal(`[SYSTEM] Synced Dieto Nutrition logs. Added +${finalAdded} kcal.`);
-                    updateProgress((baseCalories / targetCalories) * 100);
-                    
-                    // Show plate scanner
-                    document.getElementById('postOrderPanel').style.display = 'flex';
-                    document.getElementById('comparisonSummary').innerText = "Awaiting delivery scan... 🍕";
-                    
-                    // Reset cart
-                    cart = [];
-                    updateCartUI();
-                });
-            }, 1000);
+                    // POST API call to fastapi sync-order
+                    fetch('/sync-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ order_id: orderId })
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        let finalAdded = data.total_calories;
+                        if (chkMint) {
+                            finalAdded = Math.max(0, finalAdded - 150);
+                        }
+                        baseCalories += finalAdded;
+                        
+                        logTerminal(`[SYSTEM] Synced Dieto Caretaker logs. Added +${finalAdded} kcal.`);
+                        updateProgress((baseCalories / targetCalories) * 100);
+                        
+                        // Show plate scanner
+                        document.getElementById('postOrderPanel').style.display = 'flex';
+                        document.getElementById('comparisonSummary').innerText = "Awaiting delivery scan... 🍕";
+                        
+                        // Reset cart
+                        cart = [];
+                        updateCartUI();
+                    });
+                }, 800);
+            }, 600);
         }, 800);
     }
 
