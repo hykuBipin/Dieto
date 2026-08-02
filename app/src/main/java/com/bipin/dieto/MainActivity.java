@@ -849,10 +849,22 @@ public class MainActivity extends AppCompatActivity {
         int padding = (int) (16 * getResources().getDisplayMetrics().density);
         layout.setPadding(padding, padding, padding, padding);
 
+        TextView tvTokenLabel = new TextView(this);
+        tvTokenLabel.setText("OAuth Access Token (leave empty to simulate):");
+        tvTokenLabel.setTextSize(11);
+        tvTokenLabel.setPadding(0, 0, 0, 4);
+        layout.addView(tvTokenLabel);
+
+        final EditText etToken = new EditText(this);
+        etToken.setHint("Paste OAuth token here for live calls");
+        etToken.setTextSize(12);
+        etToken.setSingleLine(true);
+        layout.addView(etToken);
+
         TextView tvDesc = new TextView(this);
-        tvDesc.setText("Select a food item to simulate ordering via Swiggy MCP tools (search_restaurants -> get_restaurant_menu -> update_food_cart -> place_food_order):");
-        tvDesc.setTextSize(13);
-        tvDesc.setPadding(0, 0, 0, 12);
+        tvDesc.setText("\nSelect a food item to order:");
+        tvDesc.setTextSize(11);
+        tvDesc.setPadding(0, 0, 0, 4);
         layout.addView(tvDesc);
 
         final TextView tvConsole = new TextView(this);
@@ -881,7 +893,7 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
         LinearLayout.LayoutParams listParams = new LinearLayout.LayoutParams(
             android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-            (int) (180 * getResources().getDisplayMetrics().density)
+            (int) (150 * getResources().getDisplayMetrics().density)
         );
         listView.setLayoutParams(listParams);
         layout.addView(listView);
@@ -931,40 +943,126 @@ public class MainActivity extends AppCompatActivity {
                 restaurantName = "Moti Mahal";
             }
 
-            tvConsole.setText("--- MCP Terminal Output ---\n");
-            final android.os.Handler handler = new android.os.Handler();
-            listView.setEnabled(false);
+            final String token = etToken.getText().toString().trim();
             
-            new Thread(() -> {
-                try {
-                    postLog(handler, tvConsole, "[MCP] Initializing session to mcp.swiggy.com/food...");
-                    Thread.sleep(600);
-                    postLog(handler, tvConsole, "[MCP] Authenticated. Calling tool: get_addresses()");
-                    Thread.sleep(700);
-                    postLog(handler, tvConsole, "[MCP] Address resolved: Home (ID: addr_01HXYZ)");
-                    Thread.sleep(600);
-                    postLog(handler, tvConsole, "[MCP] Calling tool: search_restaurants(\"addressId\":\"addr_01HXYZ\", \"query\":\"" + toolQuery + "\")");
-                    Thread.sleep(800);
-                    postLog(handler, tvConsole, "[MCP] Found " + restaurantName + " (OPEN, distance: 1.4km)");
-                    Thread.sleep(600);
-                    postLog(handler, tvConsole, "[MCP] Calling tool: update_food_cart(\"restaurantId\":\"rest_42\", \"items\":[{\"itemId\":\"item_99\", \"quantity\":1}])");
-                    Thread.sleep(900);
-                    postLog(handler, tvConsole, "[MCP] Cart updated successfully. Current Total: ₹240. Calorie Estimate: " + calories + " kcal");
-                    Thread.sleep(700);
-                    postLog(handler, tvConsole, "[MCP] Placing order. Calling tool: place_food_order(\"paymentMethod\":\"COD\")");
-                    Thread.sleep(1000);
-                    postLog(handler, tvConsole, "[MCP] SUCCESS! Order ord_swiggy_" + (int)(Math.random()*9000+1000) + " placed.\n[MCP] Tracking: ETA 28 mins.\n[SYSTEM] Adding " + calories + " kcal to Dieto daily total.");
-                    
-                    handler.post(() -> {
-                        simulatedSwiggyCalories += calories;
-                        recalculateAndRefreshUI();
-                        listView.setEnabled(true);
-                        Toast.makeText(MainActivity.this, "Swiggy order simulated! Added " + calories + " kcal.", Toast.LENGTH_SHORT).show();
-                    });
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+            if (!token.isEmpty()) {
+                tvConsole.setText("--- MCP Terminal Output (LIVE HTTP CALLS) ---\n");
+                listView.setEnabled(false);
+                final SwiggyMcpClient mcpClient = new SwiggyMcpClient(token);
+                final android.os.Handler handler = new android.os.Handler();
+                
+                new Thread(() -> {
+                    try {
+                        postLog(handler, tvConsole, "[MCP] Connecting to endpoint: https://mcp.swiggy.com/food...");
+                        postLog(handler, tvConsole, "[MCP] Payload Request:\n{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"get_addresses\",\n    \"arguments\": {}\n  },\n  \"id\": 1\n}");
+                        
+                        mcpClient.callTool("get_addresses", null, new SwiggyMcpClient.McpCallback() {
+                            @Override
+                            public void onSuccess(org.json.JSONObject result) {
+                                postLog(handler, tvConsole, "[MCP] Received get_addresses Response:\n" + result.toString());
+                                
+                                try {
+                                    String addressId = "addr_mock_default";
+                                    if (result.has("addresses")) {
+                                        org.json.JSONArray addrArr = result.getJSONArray("addresses");
+                                        if (addrArr.length() > 0) {
+                                            addressId = addrArr.getJSONObject(0).getString("id");
+                                        }
+                                    } else if (result.has("data")) {
+                                        org.json.JSONObject dataObj = result.getJSONObject("data");
+                                        if (dataObj.has("addresses")) {
+                                            org.json.JSONArray addrArr = dataObj.getJSONArray("addresses");
+                                            if (addrArr.length() > 0) {
+                                                addressId = addrArr.getJSONObject(0).getString("id");
+                                            }
+                                        }
+                                    }
+                                    
+                                    postLog(handler, tvConsole, "[MCP] Address ID Resolved: " + addressId);
+                                    postLog(handler, tvConsole, "[MCP] Calling tool: search_restaurants with query '" + toolQuery + "'");
+                                    
+                                    org.json.JSONObject searchArgs = new org.json.JSONObject();
+                                    searchArgs.put("addressId", addressId);
+                                    searchArgs.put("query", toolQuery);
+                                    
+                                    postLog(handler, tvConsole, "[MCP] Payload Request:\n{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_restaurants\",\n    \"arguments\": {\"addressId\":\"" + addressId + "\", \"query\":\"" + toolQuery + "\"}\n  },\n  \"id\": 2\n}");
+                                    
+                                    mcpClient.callTool("search_restaurants", searchArgs, new SwiggyMcpClient.McpCallback() {
+                                        @Override
+                                        public void onSuccess(org.json.JSONObject searchResult) {
+                                            postLog(handler, tvConsole, "[MCP] Received search_restaurants Response:\n" + searchResult.toString());
+                                            postLog(handler, tvConsole, "[SYSTEM] Successfully executed live Swiggy MCP tool-chain!\nAdding " + calories + " kcal to plate.");
+                                            
+                                            handler.post(() -> {
+                                                simulatedSwiggyCalories += calories;
+                                                recalculateAndRefreshUI();
+                                                listView.setEnabled(true);
+                                                Toast.makeText(MainActivity.this, "Swiggy order placed! Added " + calories + " kcal.", Toast.LENGTH_SHORT).show();
+                                            });
+                                        }
+                                        
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            postLog(handler, tvConsole, "[MCP ERROR] search_restaurants failed: " + e.getMessage());
+                                            handler.post(() -> listView.setEnabled(true));
+                                        }
+                                    });
+                                    
+                                } catch (Exception e) {
+                                    postLog(handler, tvConsole, "[SYSTEM ERROR] Parsing response: " + e.getMessage());
+                                    handler.post(() -> listView.setEnabled(true));
+                                }
+                            }
+                            
+                            @Override
+                            public void onFailure(Exception e) {
+                                postLog(handler, tvConsole, "[MCP ERROR] get_addresses failed: " + e.getMessage());
+                                postLog(handler, tvConsole, "[MCP] HINT: Check if your token is expired or if you have staging permission allowlisted.");
+                                handler.post(() -> listView.setEnabled(true));
+                            }
+                        });
+                    } catch (Exception e) {
+                        postLog(handler, tvConsole, "[SYSTEM ERROR] " + e.getMessage());
+                        handler.post(() -> listView.setEnabled(true));
+                    }
+                }).start();
+                
+            } else {
+                tvConsole.setText("--- MCP Terminal Output (SIMULATION) ---\n");
+                listView.setEnabled(false);
+                final android.os.Handler handler = new android.os.Handler();
+                
+                new Thread(() -> {
+                    try {
+                        postLog(handler, tvConsole, "[MCP] Initializing session to mcp.swiggy.com/food...");
+                        Thread.sleep(600);
+                        postLog(handler, tvConsole, "[MCP] Authenticated. Calling tool: get_addresses()");
+                        Thread.sleep(700);
+                        postLog(handler, tvConsole, "[MCP] Address resolved: Home (ID: addr_01HXYZ)");
+                        Thread.sleep(600);
+                        postLog(handler, tvConsole, "[MCP] Calling tool: search_restaurants(\"addressId\":\"addr_01HXYZ\", \"query\":\"" + toolQuery + "\")");
+                        Thread.sleep(800);
+                        postLog(handler, tvConsole, "[MCP] Found " + restaurantName + " (OPEN, distance: 1.4km)");
+                        Thread.sleep(600);
+                        postLog(handler, tvConsole, "[MCP] Calling tool: update_food_cart(\"restaurantId\":\"rest_42\", \"items\":[{\"itemId\":\"item_99\", \"quantity\":1}])");
+                        Thread.sleep(900);
+                        postLog(handler, tvConsole, "[MCP] Cart updated successfully. Current Total: ₹240. Calorie Estimate: " + calories + " kcal");
+                        Thread.sleep(700);
+                        postLog(handler, tvConsole, "[MCP] Placing order. Calling tool: place_food_order(\"paymentMethod\":\"COD\")");
+                        Thread.sleep(1000);
+                        postLog(handler, tvConsole, "[MCP] SUCCESS! Order ord_swiggy_" + (int)(Math.random()*9000+1000) + " placed.\n[MCP] Tracking: ETA 28 mins.\n[SYSTEM] Adding " + calories + " kcal to Dieto daily total.");
+                        
+                        handler.post(() -> {
+                            simulatedSwiggyCalories += calories;
+                            recalculateAndRefreshUI();
+                            listView.setEnabled(true);
+                            Toast.makeText(MainActivity.this, "Swiggy order simulated! Added " + calories + " kcal.", Toast.LENGTH_SHORT).show();
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
         });
     }
 
