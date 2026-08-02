@@ -97,12 +97,40 @@
                         android:layout_centerVertical="true"
                         android:orientation="horizontal">
 
+                        <!-- Swiggy Simulate Action -->
+                        <TextView
+                            android:id="@+id/btnSwiggySim"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🛵 SWIGGY"
+                            android:textColor="#FF9800"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="4dp"
+                            android:background="@drawable/goal_chip_normal"
+                            android:layout_marginEnd="6dp" />
+
+                        <!-- Cheat Day Action -->
+                        <TextView
+                            android:id="@+id/btnCheatDay"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="😈 CHEAT"
+                            android:textColor="#FF8A80"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="4dp"
+                            android:background="@drawable/goal_chip_normal"
+                            android:layout_marginEnd="6dp" />
+
                         <!-- Record Meal Action -->
                         <TextView
                             android:id="@+id/btnRecordMeal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="＋ RECORD"
+                            android:text="＋"
                             android:textColor="#81C784"
                             android:textSize="11sp"
                             android:textStyle="bold"
@@ -116,7 +144,7 @@
                             android:id="@+id/btnViewHistory"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="📊 HISTORY"
+                            android:text="📊"
                             android:textColor="#90CAF9"
                             android:textSize="11sp"
                             android:textStyle="bold"
@@ -490,6 +518,69 @@
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
+                <!-- Exercise Recommendation Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/exerciseCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#2E2222"
+                    app:layout_constraintTop_toBottomOf="@id/dieticianCard">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="12dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/tvExerciseEmoji"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🦊"
+                            android:textSize="28sp"
+                            android:layout_marginEnd="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvExerciseTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="EXERCISE RECOMMENDATION"
+                                android:textColor="#FF8A80"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.05" />
+
+                            <TextView
+                                android:id="@+id/tvExerciseTip"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Burn excess calories: Jumping Fox (3 sets of 10 reps)"
+                                android:textColor="#FFCDD2"
+                                android:textSize="12sp"
+                                android:lineSpacingExtra="2dp" />
+                        </LinearLayout>
+
+                        <!-- Done Checkbox -->
+                        <CheckBox
+                            android:id="@+id/cbExerciseDone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="#FF8A80"
+                            android:contentDescription="Complete exercise" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
                 <!-- Actions Button Row -->
                 <LinearLayout
                     android:id="@+id/buttonsLayout"
@@ -497,7 +588,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:orientation="horizontal"
-                    app:layout_constraintTop_toBottomOf="@id/dieticianCard"
+                    app:layout_constraintTop_toBottomOf="@id/exerciseCard"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
 

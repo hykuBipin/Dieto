@@ -83,6 +83,9 @@ public class MainActivity extends AppCompatActivity {
 
     private DietGoal currentGoal = DietGoal.BALANCED;
     private boolean isFrozen = false;
+    private boolean isCheatDay = false;
+    private int simulatedSwiggyCalories = 0;
+    private boolean isExerciseDone = false;
     private Map<String, Float> lastConsensusFoods = new HashMap<>();
     private List<BoundingBoxView.Box> lastYoloBoxes = new ArrayList<>();
     private final List<ManualBox> manualBoxes = new ArrayList<>();
@@ -195,6 +198,41 @@ public class MainActivity extends AppCompatActivity {
         TextView btnViewHistory = findViewById(R.id.btnViewHistory);
         btnRecordMeal.setOnClickListener(v -> recordCurrentMeal());
         btnViewHistory.setOnClickListener(v -> showHistoryDialog());
+
+        // Swiggy Builders Club integration components
+        final TextView btnCheatDay = findViewById(R.id.btnCheatDay);
+        if (btnCheatDay != null) {
+            btnCheatDay.setOnClickListener(v -> {
+                isCheatDay = !isCheatDay;
+                btnCheatDay.setSelected(isCheatDay);
+                if (isCheatDay) {
+                    btnCheatDay.setBackgroundResource(R.drawable.goal_chip_selected);
+                    Toast.makeText(MainActivity.this, "😈 Cheat Day Activated! Calorie warnings bypassed.", Toast.LENGTH_SHORT).show();
+                } else {
+                    btnCheatDay.setBackgroundResource(R.drawable.goal_chip_normal);
+                    Toast.makeText(MainActivity.this, "Cheat Day Deactivated. Health targets restored.", Toast.LENGTH_SHORT).show();
+                }
+                recalculateAndRefreshUI();
+            });
+        }
+
+        TextView btnSwiggySim = findViewById(R.id.btnSwiggySim);
+        if (btnSwiggySim != null) {
+            btnSwiggySim.setOnClickListener(v -> showSwiggySimDialog());
+        }
+
+        final android.widget.CheckBox cbExerciseDone = findViewById(R.id.cbExerciseDone);
+        if (cbExerciseDone != null) {
+            cbExerciseDone.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                isExerciseDone = isChecked;
+                if (isChecked) {
+                    Toast.makeText(MainActivity.this, "🏃 Exercise completed! Burned excess calories.", Toast.LENGTH_SHORT).show();
+                    new android.os.Handler().postDelayed(() -> recalculateAndRefreshUI(), 1000);
+                } else {
+                    recalculateAndRefreshUI();
+                }
+            });
+        }
 
         // Initialize state selector
         selectGoal(DietGoal.BALANCED);
@@ -637,6 +675,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // 3. Process Simulated Swiggy Order Calories
+        totalCalories += simulatedSwiggyCalories;
+
         boxView.setBoxes(displayBoxes);
 
         // UI fields
@@ -650,11 +691,14 @@ public class MainActivity extends AppCompatActivity {
             combinedConsensus.put(e.getKey(), combinedConsensus.getOrDefault(e.getKey(), 0f) + e.getValue());
         }
 
-        if (combinedConsensus.isEmpty()) {
+        if (combinedConsensus.isEmpty() && simulatedSwiggyCalories == 0) {
             tvDetectedItems.setText("Tap screen to annotate, or point camera at plate...");
         } else {
-            StringBuilder sb = new StringBuilder("Plate: ");
-            boolean first = true;
+            StringBuilder sb = new StringBuilder();
+            if (simulatedSwiggyCalories > 0) {
+                sb.append("Swiggy Order (" + simulatedSwiggyCalories + " kcal) ");
+            }
+            boolean first = (simulatedSwiggyCalories == 0);
             for (Map.Entry<String, Float> entry : combinedConsensus.entrySet()) {
                 FoodNutritionRegistry.NutritionInfo info = FoodNutritionRegistry.getNutrition(entry.getKey());
                 if (info != null) {
@@ -697,6 +741,29 @@ public class MainActivity extends AppCompatActivity {
 
         String advice = generateDieticianAdvice(totalCalories, totalCarbs, totalProtein, totalUnsaturatedFat, totalSaturatedFat, totalVitamins, combinedConsensus);
         tvDieticianTip.setText(advice);
+
+        // Update Exercise Suggestion Card visibility and text
+        androidx.cardview.widget.CardView exerciseCard = findViewById(R.id.exerciseCard);
+        if (exerciseCard != null) {
+            if (isCheatDay) {
+                exerciseCard.setVisibility(View.GONE);
+            } else if (totalCalories > currentGoal.calories && !isExerciseDone) {
+                exerciseCard.setVisibility(View.VISIBLE);
+                int excess = totalCalories - currentGoal.calories;
+                TextView tvExerciseTip = findViewById(R.id.tvExerciseTip);
+                if (tvExerciseTip != null) {
+                    if (excess <= 100) {
+                        tvExerciseTip.setText("Calorie limit exceeded by " + excess + " kcal. Recommended: Jumping Fox (3 sets of 10 reps).");
+                    } else if (excess <= 250) {
+                        tvExerciseTip.setText("Calorie limit exceeded by " + excess + " kcal. Recommended: Jumping Jacks & Squats (3 sets of 15 reps).");
+                    } else {
+                        tvExerciseTip.setText("Calorie limit exceeded by " + excess + " kcal. Recommended: Burpees (4 sets of 12 reps) or 20 mins Jog.");
+                    }
+                }
+            } else {
+                exerciseCard.setVisibility(View.GONE);
+            }
+        }
     }
 
     private void showManualAddDialog(float x, float y) {
@@ -773,8 +840,149 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
+    private void showSwiggySimDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Swiggy Builders Club MCP");
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        int padding = (int) (16 * getResources().getDisplayMetrics().density);
+        layout.setPadding(padding, padding, padding, padding);
+
+        TextView tvDesc = new TextView(this);
+        tvDesc.setText("Select a food item to simulate ordering via Swiggy MCP tools (search_restaurants -> get_restaurant_menu -> update_food_cart -> place_food_order):");
+        tvDesc.setTextSize(13);
+        tvDesc.setPadding(0, 0, 0, 12);
+        layout.addView(tvDesc);
+
+        final TextView tvConsole = new TextView(this);
+        tvConsole.setBackgroundColor(android.graphics.Color.BLACK);
+        tvConsole.setTextColor(android.graphics.Color.GREEN);
+        tvConsole.setTextSize(10);
+        tvConsole.setTypeface(android.graphics.Typeface.MONOSPACE);
+        tvConsole.setPadding(8, 8, 8, 8);
+        tvConsole.setText("--- MCP Terminal Output ---");
+        tvConsole.setHeight((int) (120 * getResources().getDisplayMetrics().density));
+        tvConsole.setMovementMethod(new android.text.method.ScrollingMovementMethod());
+
+        String[] items = {
+            "Paneer Tikka Roll (550 kcal)",
+            "Double Cheese Burger (680 kcal)",
+            "Tandoori Chicken Salad (Healthy) (350 kcal)",
+            "Butter Chicken & Naan (850 kcal)",
+            "Clear Simulated Swiggy Orders"
+        };
+
+        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<>(
+            this, android.R.layout.simple_list_item_1, items
+        );
+        
+        final android.widget.ListView listView = new android.widget.ListView(this);
+        listView.setAdapter(adapter);
+        LinearLayout.LayoutParams listParams = new LinearLayout.LayoutParams(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            (int) (180 * getResources().getDisplayMetrics().density)
+        );
+        listView.setLayoutParams(listParams);
+        layout.addView(listView);
+        
+        layout.addView(new TextView(this));
+        layout.addView(tvConsole);
+
+        builder.setView(layout);
+        builder.setNegativeButton("Close", null);
+        AlertDialog dialog = builder.show();
+
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            if (position == 4) {
+                simulatedSwiggyCalories = 0;
+                isExerciseDone = false;
+                tvConsole.setText("--- MCP Terminal Output ---\n[SYSTEM] Reset all simulated Swiggy orders.");
+                recalculateAndRefreshUI();
+                android.widget.CheckBox cbDone = findViewById(R.id.cbExerciseDone);
+                if (cbDone != null) cbDone.setChecked(false);
+                return;
+            }
+
+            final String itemName;
+            final int calories;
+            final String toolQuery;
+            final String restaurantName;
+            
+            if (position == 0) {
+                itemName = "Paneer Tikka Roll";
+                calories = 550;
+                toolQuery = "paneer";
+                restaurantName = "Punjabi Rasoi";
+            } else if (position == 1) {
+                itemName = "Double Cheese Burger";
+                calories = 680;
+                toolQuery = "burger";
+                restaurantName = "Burger Club";
+            } else if (position == 2) {
+                itemName = "Tandoori Chicken Salad";
+                calories = 350;
+                toolQuery = "tandoori salad";
+                restaurantName = "Healthy Bites";
+            } else {
+                itemName = "Butter Chicken & Naan";
+                calories = 850;
+                toolQuery = "butter chicken";
+                restaurantName = "Moti Mahal";
+            }
+
+            tvConsole.setText("--- MCP Terminal Output ---\n");
+            final android.os.Handler handler = new android.os.Handler();
+            listView.setEnabled(false);
+            
+            new Thread(() -> {
+                try {
+                    postLog(handler, tvConsole, "[MCP] Initializing session to mcp.swiggy.com/food...");
+                    Thread.sleep(600);
+                    postLog(handler, tvConsole, "[MCP] Authenticated. Calling tool: get_addresses()");
+                    Thread.sleep(700);
+                    postLog(handler, tvConsole, "[MCP] Address resolved: Home (ID: addr_01HXYZ)");
+                    Thread.sleep(600);
+                    postLog(handler, tvConsole, "[MCP] Calling tool: search_restaurants(\"addressId\":\"addr_01HXYZ\", \"query\":\"" + toolQuery + "\")");
+                    Thread.sleep(800);
+                    postLog(handler, tvConsole, "[MCP] Found " + restaurantName + " (OPEN, distance: 1.4km)");
+                    Thread.sleep(600);
+                    postLog(handler, tvConsole, "[MCP] Calling tool: update_food_cart(\"restaurantId\":\"rest_42\", \"items\":[{\"itemId\":\"item_99\", \"quantity\":1}])");
+                    Thread.sleep(900);
+                    postLog(handler, tvConsole, "[MCP] Cart updated successfully. Current Total: ₹240. Calorie Estimate: " + calories + " kcal");
+                    Thread.sleep(700);
+                    postLog(handler, tvConsole, "[MCP] Placing order. Calling tool: place_food_order(\"paymentMethod\":\"COD\")");
+                    Thread.sleep(1000);
+                    postLog(handler, tvConsole, "[MCP] SUCCESS! Order ord_swiggy_" + (int)(Math.random()*9000+1000) + " placed.\n[MCP] Tracking: ETA 28 mins.\n[SYSTEM] Adding " + calories + " kcal to Dieto daily total.");
+                    
+                    handler.post(() -> {
+                        simulatedSwiggyCalories += calories;
+                        recalculateAndRefreshUI();
+                        listView.setEnabled(true);
+                        Toast.makeText(MainActivity.this, "Swiggy order simulated! Added " + calories + " kcal.", Toast.LENGTH_SHORT).show();
+                    });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        });
+    }
+
+    private void postLog(android.os.Handler handler, final TextView tvConsole, final String msg) {
+        handler.post(() -> {
+            tvConsole.append("\n" + msg);
+            int scrollAmount = tvConsole.getLayout() != null ? tvConsole.getLayout().getLineTop(tvConsole.getLineCount()) - tvConsole.getHeight() : 0;
+            if (scrollAmount > 0) {
+                tvConsole.scrollTo(0, scrollAmount);
+            }
+        });
+    }
+
     private String generateDieticianAdvice(int calories, float carbs, float protein, float unsaturatedFat, float saturatedFat, Map<String, Integer> vitamins, Map<String, Float> consensusFoods) {
-        if (consensusFoods.isEmpty()) {
+        if (isCheatDay) {
+            return "😈 CHEAT DAY MODE ACTIVE!\nWarnings and exercise challenges are bypassed. Enjoy your cheat meal, relax, and stay happy!";
+        }
+        if (consensusFoods.isEmpty() && simulatedSwiggyCalories == 0) {
             return "Point camera at your plate. Select your diet profile above to get personalized suggestions.";
         }
 
