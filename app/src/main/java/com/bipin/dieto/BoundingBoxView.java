@@ -53,13 +53,16 @@ public class BoundingBoxView extends View {
             // Classify food items for custom color-coding
             int color = Color.parseColor("#4DD0E1"); // standard cyan
             String lower = b.label.toLowerCase();
-            if (lower.contains("banana") || lower.contains("apple") || lower.contains("orange") || 
-                lower.contains("broccoli") || lower.contains("carrot")) {
+            if (lower.contains("plate") || lower.contains("bowl") || lower.contains("thali")) {
+                color = Color.parseColor("#AB47BC"); // vibrant purple for plate/bowl
+            } else if (lower.contains("banana") || lower.contains("apple") || lower.contains("orange") || 
+                lower.contains("broccoli") || lower.contains("carrot") || lower.contains("salad")) {
                 color = Color.parseColor("#66BB6A"); // soft green for fruits/veg
             } else if (lower.contains("donut") || lower.contains("cake")) {
                 color = Color.parseColor("#EC407A"); // soft pink for sweets
-            } else if (lower.contains("pizza") || lower.contains("hot dog") || lower.contains("sandwich")) {
-                color = Color.parseColor("#FFA726"); // orange/amber for main meals
+            } else if (lower.contains("swiggy") || lower.contains("biryani") || lower.contains("roll") ||
+                lower.contains("pizza") || lower.contains("hot dog") || lower.contains("sandwich") || lower.contains("burger")) {
+                color = Color.parseColor("#FFA726"); // orange/amber for main meals & Swiggy orders
             }
 
             paint.setColor(color);
@@ -71,13 +74,21 @@ public class BoundingBoxView extends View {
             // Calculate label dimensions
             float textWidth = textPaint.measureText(b.label);
             float badgeHeight = 42f;
+            float badgeTop = b.top - badgeHeight;
+            float badgeBottom = b.top;
 
-            // Draw solid label background badge just above the bounding box
+            // If box is at the very top edge of the screen, draw badge inside the box
+            if (badgeTop < 0) {
+                badgeTop = b.top;
+                badgeBottom = b.top + badgeHeight;
+            }
+
+            // Draw solid label background badge
             canvas.drawRoundRect(
                     b.left,
-                    b.top - badgeHeight,
-                    b.left + textWidth + 20f,
-                    b.top,
+                    badgeTop,
+                    b.left + textWidth + 24f,
+                    badgeBottom,
                     8f, 8f,
                     badgePaint
             );
@@ -85,8 +96,8 @@ public class BoundingBoxView extends View {
             // Draw white label text inside the badge
             canvas.drawText(
                     b.label,
-                    b.left + 10f,
-                    b.top - 10f,
+                    b.left + 12f,
+                    badgeBottom - 10f,
                     textPaint
             );
         }

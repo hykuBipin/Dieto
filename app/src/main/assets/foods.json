@@ -278,5 +278,149 @@
       "Vitamin D": 10,
       "Iron": 5
     }
+  },
+  {
+    "key": "plate",
+    "name": "Meal Plate / Thali",
+    "serving": "1 balanced plate (350g)",
+    "calories": 420,
+    "carbs": 48.0,
+    "protein": 18.0,
+    "unsaturatedFat": 8.0,
+    "saturatedFat": 3.0,
+    "vitamins": {
+      "Vitamin A": 25,
+      "Vitamin C": 30,
+      "Iron": 15
+    }
+  },
+  {
+    "key": "bowl",
+    "name": "Meal Bowl / Salad",
+    "serving": "1 bowl (300g)",
+    "calories": 350,
+    "carbs": 40.0,
+    "protein": 16.0,
+    "unsaturatedFat": 6.0,
+    "saturatedFat": 2.5,
+    "vitamins": {
+      "Vitamin A": 20,
+      "Vitamin C": 25,
+      "Iron": 12
+    }
+  },
+  {
+    "key": "paneer tikka roll",
+    "name": "Paneer Tikka Roll",
+    "serving": "1 roll (220g)",
+    "calories": 550,
+    "carbs": 48.0,
+    "protein": 22.0,
+    "unsaturatedFat": 14.0,
+    "saturatedFat": 8.0,
+    "vitamins": {
+      "Calcium": 25,
+      "Iron": 12
+    }
+  },
+  {
+    "key": "double cheese burger",
+    "name": "Double Cheese Burger",
+    "serving": "1 burger (260g)",
+    "calories": 680,
+    "carbs": 48.0,
+    "protein": 34.0,
+    "unsaturatedFat": 18.0,
+    "saturatedFat": 14.0,
+    "vitamins": {
+      "Calcium": 30,
+      "Iron": 25
+    }
+  },
+  {
+    "key": "tandoori chicken salad",
+    "name": "Tandoori Chicken Salad",
+    "serving": "1 bowl (280g)",
+    "calories": 350,
+    "carbs": 14.0,
+    "protein": 38.0,
+    "unsaturatedFat": 8.0,
+    "saturatedFat": 4.0,
+    "vitamins": {
+      "Vitamin A": 35,
+      "Vitamin C": 40,
+      "Iron": 18
+    }
+  },
+  {
+    "key": "butter chicken & naan",
+    "name": "Butter Chicken & Naan",
+    "serving": "1 combo (380g)",
+    "calories": 850,
+    "carbs": 65.0,
+    "protein": 42.0,
+    "unsaturatedFat": 24.0,
+    "saturatedFat": 18.0,
+    "vitamins": {
+      "Calcium": 15,
+      "Iron": 20
+    }
+  },
+  {
+    "key": "biryani",
+    "name": "Chicken Biryani",
+    "serving": "1 plate (350g)",
+    "calories": 550,
+    "carbs": 58.0,
+    "protein": 28.0,
+    "unsaturatedFat": 12.0,
+    "saturatedFat": 6.0,
+    "vitamins": {
+      "Iron": 15,
+      "Vitamin B6": 20
+    }
+  },
+  {
+    "key": "rice",
+    "name": "Steamed Rice",
+    "serving": "1 cup (158g)",
+    "calories": 130,
+    "carbs": 28.0,
+    "protein": 2.7,
+    "unsaturatedFat": 0.2,
+    "saturatedFat": 0.1,
+    "vitamins": {
+      "Iron": 4,
+      "Folate": 12
+    }
+  },
+  {
+    "key": "roti",
+    "name": "Whole Wheat Roti",
+    "serving": "1 piece (40g)",
+    "calories": 120,
+    "carbs": 22.0,
+    "protein": 3.5,
+    "unsaturatedFat": 1.5,
+    "saturatedFat": 0.5,
+    "vitamins": {
+      "Iron": 6,
+      "Fiber": 12
+    }
+  },
+  {
+    "key": "curry",
+    "name": "Dal / Lentil Curry",
+    "serving": "1 bowl (180g)",
+    "calories": 180,
+    "carbs": 24.0,
+    "protein": 11.0,
+    "unsaturatedFat": 3.0,
+    "saturatedFat": 1.0,
+    "vitamins": {
+      "Iron": 14,
+      "Folate": 20
+    }
   }
 ]
+

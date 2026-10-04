@@ -435,6 +435,256 @@ HTML_CONTENT = """<!DOCTYPE html>
         .btn-scan:hover {
             background-color: #0d9488;
         }
+
+        /* Delivery Banner */
+        .delivery-banner {
+            display: none;
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: #ffffff;
+            padding: 16px 40px;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.25);
+            align-items: center;
+            justify-content: space-between;
+            animation: slideDown 0.4s ease-out;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            position: sticky;
+            top: 65px;
+            z-index: 99;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .delivery-banner-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .delivery-badge-icon {
+            font-size: 32px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delivery-banner-text h4 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .delivery-banner-text p {
+            font-size: 13px;
+            opacity: 0.95;
+        }
+
+        .btn-camera-scan {
+            background-color: #ffffff;
+            color: #065f46;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-camera-scan:hover {
+            transform: scale(1.05);
+            background-color: #f0fdf4;
+        }
+
+        /* Camera Scan Modal */
+        .camera-modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .camera-modal-box {
+            background: #18181b;
+            color: #f4f4f5;
+            width: 620px;
+            max-width: 92%;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-modal-close {
+            background: transparent;
+            border: none;
+            color: #a1a1aa;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .btn-modal-close:hover { color: #fff; }
+
+        .viewfinder-window {
+            position: relative;
+            height: 220px;
+            background: radial-gradient(circle at center, #27272a, #09090b);
+            border-radius: 12px;
+            border: 2px dashed #52525b;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scan-laser-line {
+            position: absolute;
+            left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, #10B981, transparent);
+            box-shadow: 0 0 12px #10B981;
+            animation: laserScan 2.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes laserScan {
+            0% { top: 10%; }
+            100% { top: 90%; }
+        }
+
+        .viewfinder-tag {
+            position: absolute;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10B981;
+            color: #34d399;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .viewfinder-tag.tag-plate {
+            border-color: #AB47BC;
+            color: #E1BEE7;
+            background: rgba(171, 71, 188, 0.25);
+            top: 15%; left: 15%;
+        }
+
+        .viewfinder-tag.tag-item {
+            top: 45%; left: 35%;
+            font-size: 12px;
+        }
+
+        .viewfinder-tag.tag-sub {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #F59E0B;
+            color: #FCD34D;
+        }
+
+        .controls-heading {
+            font-size: 13px;
+            font-weight: 600;
+            color: #d4d4d8;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag-chip {
+            background: #27272a;
+            color: #a1a1aa;
+            border: 1px solid #3f3f46;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .tag-chip.active {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10B981;
+            color: #6ee7b7;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+
+        .portion-scale-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 13px;
+            color: #d4d4d8;
+            margin-top: 4px;
+        }
+
+        .portion-scale-row input[type="range"] {
+            accent-color: #10B981;
+            cursor: pointer;
+        }
+
+        .modal-calc-box {
+            background: #27272a;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #e4e4e7;
+            border: 1px solid #3f3f46;
+            text-align: center;
+        }
+
+        .btn-confirm-plate {
+            background: #10B981;
+            color: #ffffff;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .btn-confirm-plate:hover {
+            background: #059669;
+        }
     </style>
 </head>
 <body>
@@ -449,6 +699,18 @@ HTML_CONTENT = """<!DOCTYPE html>
     </div>
     <input type="text" class="search-bar" placeholder="Search for dishes, rolls, biryani...">
 </header>
+
+<!-- Delivery Notification Banner -->
+<div class="delivery-banner" id="deliveryNotificationBanner">
+    <div class="delivery-banner-left">
+        <span class="delivery-badge-icon">🛵</span>
+        <div class="delivery-banner-text">
+            <h4>Swiggy Order Delivered!</h4>
+            <p id="deliveryBannerDesc">Your hot meal has arrived at your doorstep. Open Dieto Vision to scan your plate.</p>
+        </div>
+    </div>
+    <button class="btn-camera-scan" id="btnDeliveryCameraScan" onclick="openCameraScanModal()">📷 Camera Scan</button>
+</div>
 
 <div class="container">
     <!-- Left Column: Menu Items -->
@@ -763,6 +1025,14 @@ HTML_CONTENT = """<!DOCTYPE html>
                     logTerminal(`[MCP] Success! Order placed. ID: ${orderId}`);
                     logTerminal("[SYSTEM] Swiggy Order Completed successfully!");
                     
+                    let lastOrderName = cart.length > 0 ? cart[0].name : "Double Cheese Burger";
+                    let lastOrderCal = cart.reduce((sum, i) => sum + i.calories, 0) || 680;
+                    let lastOrderProt = cart.reduce((sum, i) => sum + i.protein, 0) || 28;
+
+                    currentOrderedItem = lastOrderName;
+                    currentOrderedCalories = lastOrderCal;
+                    currentOrderedProtein = lastOrderProt;
+
                     // Read checkboxes
                     const chkMint = document.getElementById('chkMintJuice').checked;
                     const chkExercise = document.getElementById('chkExercise').checked;
@@ -784,10 +1054,12 @@ HTML_CONTENT = """<!DOCTYPE html>
                         logTerminal(`[SYSTEM] Synced Dieto Caretaker logs. Added +${finalAdded} kcal.`);
                         updateProgress((baseCalories / targetCalories) * 100);
                         
-                        // Show plate scanner
-                        document.getElementById('postOrderPanel').style.display = 'flex';
-                        document.getElementById('comparisonSummary').innerText = "Awaiting delivery scan... 🍕";
-                        
+                        // Show delivery notification banner
+                        const banner = document.getElementById('deliveryNotificationBanner');
+                        document.getElementById('deliveryBannerDesc').innerText = `Your ${lastOrderName} has arrived hot and fresh from Swiggy! Click 'Camera Scan' to verify your plate.`;
+                        banner.style.display = 'flex';
+                        banner.scrollIntoView({ behavior: 'smooth' });
+
                         // Reset cart
                         cart = [];
                         updateCartUI();
@@ -797,51 +1069,182 @@ HTML_CONTENT = """<!DOCTYPE html>
         }, 800);
     }
 
+    let currentOrderedItem = "Double Cheese Burger";
+    let currentOrderedCalories = 680;
+    let currentOrderedProtein = 28;
+
+    let portionState = {
+        patty: true,
+        cheese: true,
+        sauce: true,
+        bun: true,
+        scale: 1.0
+    };
+
+    function openCameraScanModal() {
+        document.getElementById('cameraModalBackdrop').style.display = 'flex';
+        document.getElementById('vfTagMain').innerText = `🍔 ${currentOrderedItem} (94% conf)`;
+        recalcModalNutrition();
+        logTerminal(`[VISION] Opened Camera Scan View for ${currentOrderedItem}`);
+    }
+
+    function closeCameraScanModal() {
+        document.getElementById('cameraModalBackdrop').style.display = 'none';
+    }
+
+    function toggleTag(tag) {
+        portionState[tag] = !portionState[tag];
+        const chip = document.getElementById('chip' + tag.charAt(0).toUpperCase() + tag.slice(1));
+        if (portionState[tag]) {
+            chip.classList.add('active');
+        } else {
+            chip.classList.remove('active');
+        }
+        recalcModalNutrition();
+    }
+
+    function onPortionSlider(val) {
+        portionState.scale = parseFloat(val);
+        document.getElementById('lblPortionScale').innerText = `${val}x (${Math.round(val * 100)}% of order)`;
+        recalcModalNutrition();
+    }
+
+    function recalcModalNutrition() {
+        let cal = 0;
+        let prot = 0;
+        let carb = 0;
+
+        if (portionState.patty) { cal += 360; prot += 20; carb += 2; }
+        if (portionState.cheese) { cal += 140; prot += 6; carb += 2; }
+        if (portionState.sauce) { cal += 80; prot += 0; carb += 6; }
+        if (portionState.bun) { cal += 100; prot += 2; carb += 32; }
+
+        cal = Math.round(cal * portionState.scale);
+        prot = (prot * portionState.scale).toFixed(1);
+        carb = (carb * portionState.scale).toFixed(1);
+
+        document.getElementById('modalCalVal').innerText = cal;
+        document.getElementById('modalProtVal').innerText = prot;
+        document.getElementById('modalCarbVal').innerText = carb;
+
+        return { cal, prot, carb };
+    }
+
+    function confirmScannedPlate() {
+        const { cal: scannedCal, prot: scannedProt, carb: scannedCarb } = recalcModalNutrition();
+        closeCameraScanModal();
+        
+        // Hide banner
+        document.getElementById('deliveryNotificationBanner').style.display = 'none';
+
+        // Show Post-Order Panel
+        const panel = document.getElementById('postOrderPanel');
+        panel.style.display = 'flex';
+        panel.scrollIntoView({ behavior: 'smooth' });
+
+        const divergence = scannedCal - currentOrderedCalories;
+        const badge = document.getElementById('comparisonSummary');
+        
+        if (divergence < 0) {
+            badge.innerText = `You ate lighter than estimated (${divergence} kcal). Excellent!`;
+            badge.className = "comparison-badge";
+        } else if (divergence > 0) {
+            badge.innerText = `Plate portion slightly higher (+${divergence} kcal). Recovery tip active.`;
+            badge.className = "comparison-badge warn";
+        } else {
+            badge.innerText = `Plate matches Swiggy order estimate perfectly (0 kcal diff)!`;
+            badge.className = "comparison-badge";
+        }
+
+        // Show Plate details
+        const details = document.getElementById('plateNutritionDetails');
+        details.innerHTML = `<strong>Swiggy Order Estimate</strong>: ${currentOrderedCalories} kcal (${currentOrderedProtein}g protein)<br>` +
+                            `<strong>Actual Scanned Plate Estimate</strong>: <span style="color:#10B981; font-weight:700;">${scannedCal} kcal</span> (${scannedProt}g protein, ${scannedCarb}g carbs) [Portion: ${portionState.scale}x]<br>` +
+                            `<strong>Portion Difference</strong>: ${divergence > 0 ? '+' : ''}${divergence} kcal`;
+
+        // Render dynamic Coach Recommendations
+        const coachList = document.getElementById('recoveryCoachList');
+        coachList.innerHTML = '<strong>Dieto Health Coach Recovery Actions</strong>:';
+        
+        let recs = [];
+        if (divergence > 100) {
+            recs = [
+                "🚶 Take a light 15-20 minute post-meal walk to support glucose regulation.",
+                "💧 Drink 1-2 glasses of water or warm green tea.",
+                "🥗 Make dinner a high-fiber vegetable bowl to balance today's intake."
+            ];
+        } else if (divergence < 0) {
+            recs = [
+                "🎉 Great portion control! You left room in your calorie budget.",
+                "💧 Continue normal hydration throughout the day.",
+                "😴 Maintain a 7-8 hour sleep schedule to assist muscle synthesis."
+            ];
+        } else {
+            recs = [
+                "✨ Perfect tracking! Meal matches your diet profile accurately.",
+                "💧 Stay hydrated with water or mint infused tea.",
+                "🏃 Regular daily activity recommended."
+            ];
+        }
+
+        recs.forEach(rec => {
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.innerHTML = `<span>${rec}</span>`;
+            coachList.appendChild(div);
+        });
+
+        // Adjust base calories to reflect scanned calories
+        baseCalories = (baseCalories - currentOrderedCalories) + scannedCal;
+        updateProgress((baseCalories / targetCalories) * 100);
+
+        logTerminal(`[VISION] Confirmed Scanned Plate: ${scannedCal} kcal (${divergence >= 0 ? '+' : ''}${divergence} kcal divergence). Dynamic portion calculation complete.`);
+    }
+
     function triggerSimulatedScan() {
-        if (!orderPlacedId) return;
-        
-        document.getElementById('comparisonSummary').innerText = "📷 Scanning camera feed... Detecting items...";
-        
-        setTimeout(() => {
-            // Call compare-plate API
-            fetch('/compare-plate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    order_id: orderPlacedId,
-                    detected_items: ["Chicken Biryani", "Chicken 65", "Raita"]
-                })
-            })
-            .then(r => r.json())
-            .then(data => {
-                const badge = document.getElementById('comparisonSummary');
-                badge.innerText = data.comparison_result;
-                
-                if (data.calorie_difference > 0) {
-                    badge.className = "comparison-badge warn";
-                } else {
-                    badge.className = "comparison-badge";
-                }
-
-                // Show Plate details
-                const details = document.getElementById('plateNutritionDetails');
-                details.innerHTML = `<strong>Swiggy Order Estimate</strong>: ${data.order_estimated_calories} kcal<br>` +
-                                    `<strong>Actual Scanned Plate Estimate</strong>: ${data.plate_scanned_calories} kcal<br>` +
-                                    `<strong>Divergence</strong>: ${data.calorie_difference > 0 ? '+' : ''}${data.calorie_difference} kcal`;
-
-                // Render Coach Recommendations
-                const coachList = document.getElementById('recoveryCoachList');
-                coachList.innerHTML = '<strong>Dieto Health Coach Recovery Actions</strong>:';
-                data.coach_advice.recommendations.forEach(rec => {
-                    const div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    div.innerHTML = `<span>${rec}</span>`;
-                    coachList.appendChild(div);
-                });
-            });
-        }, 1200);
+        openCameraScanModal();
     }
 </script>
+
+<!-- Camera Scan Modal -->
+<div class="camera-modal-backdrop" id="cameraModalBackdrop" style="display:none;">
+    <div class="camera-modal-box">
+        <div class="modal-header">
+            <div class="modal-title">📷 Dieto Vision — Live Plate Scanner</div>
+            <button class="btn-modal-close" onclick="closeCameraScanModal()">✕</button>
+        </div>
+        <div class="viewfinder-window">
+            <div class="scan-laser-line"></div>
+            <div class="viewfinder-tag tag-plate">🍽️ Meal Plate [COCO: bowl]</div>
+            <div class="viewfinder-tag tag-item" id="vfTagMain">🍔 Double Cheese Burger (94% conf)</div>
+            <div class="viewfinder-tag tag-sub" id="vfTagSub1" style="top: 65%; left: 30%;">🥩 Patty</div>
+            <div class="viewfinder-tag tag-sub" id="vfTagSub2" style="top: 65%; left: 55%;">🧀 Cheese</div>
+        </div>
+        
+        <div class="controls-heading">Toggle & Adjust Detected Portion Tags:</div>
+        <div class="tags-container" id="portionTagsContainer">
+            <button class="tag-chip active" id="chipPatty" onclick="toggleTag('patty')">🥩 Double Patty (100%)</button>
+            <button class="tag-chip active" id="chipCheese" onclick="toggleTag('cheese')">🧀 Cheddar Cheese (100%)</button>
+            <button class="tag-chip active" id="chipSauce" onclick="toggleTag('sauce')">🥫 Sauce & Mayo (100%)</button>
+            <button class="tag-chip active" id="chipBun" onclick="toggleTag('bun')">🍞 Bun (100%)</button>
+        </div>
+        
+        <div class="portion-scale-row">
+            <label>Plate Serving Factor: <strong id="lblPortionScale">1.0x (100% of order)</strong></label>
+            <input type="range" id="rangePortion" min="0.5" max="1.5" step="0.1" value="1.0" oninput="onPortionSlider(this.value)">
+        </div>
+        
+        <div class="modal-calc-box" id="modalCalculatedBox">
+            🔥 Scanned Plate Calories: <strong id="modalCalVal" style="color:#10B981; font-size:15px;">680</strong> kcal | 
+            💪 Protein: <strong id="modalProtVal" style="color:#60A5FA;">28.0</strong>g | 
+            🥖 Carbs: <strong id="modalCarbVal" style="color:#FBBF24;">42.0</strong>g
+        </div>
+        
+        <button class="btn-confirm-plate" id="btnConfirmPlate" onclick="confirmScannedPlate()">
+            ✓ Confirm Scanned Plate
+        </button>
+    </div>
+</div>
 
 </body>
 </html>

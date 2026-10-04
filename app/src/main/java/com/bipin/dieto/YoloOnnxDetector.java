@@ -151,11 +151,13 @@ public class YoloOnnxDetector {
                     }
                 }
 
-                if (maxScore > 0.40f) { // Confidence threshold (lowered to 0.40 to capture detections)
-                    // YOLO outputs center x,y. Convert to top-left x,y.
-                    float left = x - w / 2f;
-                    float top = y - h / 2f;
-                    detections.add(new Detection(left, top, w, h, maxScore, classId));
+                if (maxScore > 0.25f) { // Confidence threshold (responsive for mobile cameras)
+                    // YOLO outputs center x,y,w,h in 0..640 pixel coordinates. Normalize to [0.0, 1.0]
+                    float normLeft = Math.max(0f, Math.min(1f, (x - w / 2f) / (float) INPUT_SIZE));
+                    float normTop = Math.max(0f, Math.min(1f, (y - h / 2f) / (float) INPUT_SIZE));
+                    float normW = Math.max(0.001f, Math.min(1f - normLeft, w / (float) INPUT_SIZE));
+                    float normH = Math.max(0.001f, Math.min(1f - normTop, h / (float) INPUT_SIZE));
+                    detections.add(new Detection(normLeft, normTop, normW, normH, maxScore, classId));
                 }
             }
         } catch (Exception e) {

@@ -13,3 +13,4 @@ venv/
 # Local model copy in root (keep assets/yolov8n.onnx, but ignore root pt and onnx)
 /*.onnx
 /*.pt
+dropme/
